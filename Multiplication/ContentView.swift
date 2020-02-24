@@ -87,6 +87,13 @@ struct ContentView: View {
     @State private var i = 1
     @State private var answer = ""
     @State private var points = 0
+    @State private var answers = [""]
+    @State private var corectness = [""]
+    @State private var counter = 1
+    @State private var showScore = false
+    @State private var menu = true
+    @State private var hardcore = false
+    @State private var choice = 1
     @State private var oneNum = Int.random(in: 1...10)
     @State private var twoNum = Int.random(in: 1...10)
     func CorrectAswer() -> String {
@@ -95,83 +102,222 @@ struct ContentView: View {
     }
     var body: some View {
         NavigationView{
+            
+           
             return ZStack{
-                AngularGradient(gradient: Gradient(colors: [ .white,.white]), center: .topTrailing).edgesIgnoringSafeArea(.all)
-                VStack{
-                    Spacer()
-                    Text("Правильных ответов: \(points)")
-                    .fontWeight(.bold)
-                    .foregroundColor(.green)
-                    .font(.system(size: 26))
-                    .shadow(color: .black, radius:0.2)
-                    Text("\(oneNum)х\(twoNum)")
-                    .fontWeight(.bold)
-                    .foregroundColor(.green)
-                    .font(.system(size: 80))
-                    .shadow(color: .black, radius:0.5)
-                    Spacer()
-                    Text("\(self.answer)")
-                    .fontWeight(.bold)
-                    .foregroundColor(.orange)
-                    .font(.system(size: 80))
-                        .shadow(color: .black, radius:0.5)
-                    Spacer()
+                if menu && !showScore{
                     VStack{
-                     
-                     ForEach(1..<4){y in
-                     HStack{
-                         ForEach(1..<4){x in
-                             
-                             Button(action:{
-                                self.Calculate(y:y,x:x)
-                             })
-                             {
-                                 CalculatorButton(y:y,x:x)
-                             }
-                             .padding(3)
-                             
-                         }
-                         
-                         
-                         }
-                    
-                     }
-                    
-                     }
+                    Text("Выберите столбец для изучения")
+                   .fontWeight(.bold)
+                   .foregroundColor(.green)
+                   .font(.system(size: 70))
+                   .shadow(color: .black, radius:0.2)
+                    Spacer()
+                    Picker("", selection: $choice)
+                    {
+                        ForEach(0..<10){ number in
+                            Text("\(number)")
+                            .font(.system(size: 30))
+                            .fontWeight(.semibold)
+                            .foregroundColor(.green)
+                            .multilineTextAlignment(.center)
+                            }
+                                                            
+                        }
+                            .labelsHidden()
+                            .pickerStyle(WheelPickerStyle())
+                    Spacer()
                     HStack{
                     Button(action:{
-                       self.Calculate(y:0,x:0)
-                    })
-                    {
-                        CalculatorButton(y:0,x:0)
-                    }.padding(2)
-                    Button(action:{
-                        self.answer=String(self.answer.dropLast())
-                    })
-                    {
-                        Text("Стереть")
-                        .fontWeight(.bold)
-                        .modifier(Delete())
-                    }.padding(2)
-                    
-                    }
-                    HStack{
-                        Button(action:{
-                            self.CheckAnswer(self.answer,self.CorrectAswer())
-                            self.answer=""
-                            self.oneNum = Int.random(in: 1...10)
-                            self.twoNum = Int.random(in: 1...10)
-
-                            
+      
+                         self.showScore = false
+                         self.menu = false
+                        self.oneNum = Int.random(in: 1...10)
+                        self.twoNum = Int.random(in: 1...10)
+                        self.hardcore = true
                         })
                         {
-                            Text("Принять")
+                            Text("Хардкор")
                             .fontWeight(.bold)
-                            .modifier(BigButton())
-                        }.padding(.vertical, 10.0)
+                            .font(.largeTitle)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 5.0)
+                            .padding(.horizontal, 10.0)
+                            .frame(width: 300, height: 40)
+                            .background(LinearGradient(gradient: Gradient(colors: [.orange, .red]), startPoint: .top, endPoint: .bottom))
+                            .overlay(RoundedRectangle(cornerRadius: 200).stroke(Color.black,lineWidth:3))
+                            .clipShape(RoundedRectangle(cornerRadius: 200))
+                             .shadow(color: .black, radius:1)
+                         }.padding(.vertical, 10.0)
+                     }
+                    HStack{
+                       Button(action:{
+                            self.oneNum = self.choice
+                            self.showScore = false
+                            self.menu = false
+                         self.hardcore = false
+                           })
+                           {
+                               Text("Погнали")
+                               .fontWeight(.bold)
+                               .modifier(BigButton())
+                            }.padding(.vertical, 10.0)
+                        }
+                    
+                    
                     }
-                
                 }
+                else if !showScore && !menu{
+                    AngularGradient(gradient: Gradient(colors: [ .white,.white]), center: .topTrailing).edgesIgnoringSafeArea(.all)
+                    VStack{
+                        Spacer()
+                        Text("Правильных ответов: \(self.points)")
+                        .fontWeight(.bold)
+                        .foregroundColor(.green)
+                        .font(.system(size: 26))
+                        .shadow(color: .black, radius:0.2)
+                        Text("\(oneNum)х\(twoNum)")
+                        .fontWeight(.bold)
+                        .foregroundColor(.green)
+                        .font(.system(size: 80))
+                        .shadow(color: .black, radius:0.5)
+                        Spacer()
+                        Text("\(self.answer)")
+                        .fontWeight(.bold)
+                        .foregroundColor(.orange)
+                        .font(.system(size: 80))
+                            .shadow(color: .black, radius:0.5)
+                        Spacer()
+                        VStack{
+                         
+                         ForEach(1..<4){y in
+                         HStack{
+                             ForEach(1..<4){x in
+                                 
+                                 Button(action:{
+                                   
+                                        self.Calculate(y:y,x:x)
+                                    
+                                 })
+                                 {
+                                     CalculatorButton(y:y,x:x)
+                                 }
+                                 .padding(3)
+                                 
+                             }
+                             
+                             
+                             }
+                        
+                         }
+                        
+                         }
+                        HStack{
+                        Button(action:{
+                           self.Calculate(y:0,x:0)
+                        })
+                        {
+                            CalculatorButton(y:0,x:0)
+                        }.padding(2)
+                        Button(action:{
+                            self.answer=String(self.answer.dropLast())
+                        })
+                        {
+                            Text("Стереть")
+                            .fontWeight(.bold)
+                            .modifier(Delete())
+                        }.padding(2)
+                        
+                        }
+                        HStack{
+                            Button(action:{
+                                self.counter+=1;
+                               
+                                    self.answers+=["\(self.oneNum)x\(self.twoNum)=\(self.CorrectAswer())"]
+                                    self.CheckAnswer(self.answer,self.CorrectAswer())
+                                if self.counter<10{
+                                    self.answer=""
+                                if self.hardcore{
+                                    self.oneNum = Int.random(in: 1...10)
+                                }
+                                    self.twoNum = Int.random(in: 1...10)
+                                }
+                                if self.counter>=10{
+                                    self.showScore=true
+                                }
+                                
+                                
+                                
+                            })
+                            {
+                                Text("Принять")
+                                .fontWeight(.bold)
+                                .modifier(BigButton())
+                            }.padding(.vertical, 10.0)
+                        }
+                    }
+                }
+                    else{
+                        VStack{
+                            Text("Правильных ответов: \(points)")
+                            .fontWeight(.bold)
+                            .foregroundColor(.green)
+                            .font(.system(size: 26))
+                            .shadow(color: .black, radius:0.2)
+                             Spacer()
+                            ForEach(0..<self.counter){counter in
+                                HStack{
+                                    Text("\(self.answers[counter])")
+                                    .fontWeight(.bold)
+                                    .foregroundColor((self.corectness[counter]=="Error") ? .red : .green)
+                                   
+                                    .font(.system(size: 50))
+                                    .shadow(color: .black, radius:0.5)
+
+                                    Spacer()
+                                }
+                            }.padding(.horizontal, 20.0)
+                             Spacer()
+                            HStack{
+                                Button(action:{
+                                    if self.hardcore {
+                                        self.oneNum = Int.random(in: 1...10)
+                                    }
+                                    self.twoNum = Int.random(in: 1...10)
+                                    
+                                    self.answer=""
+                                    self.showScore=false
+                                    self.counter=1
+                                    self.answers = [""]
+                                    self.points=0
+                                })
+                                {
+                                    Text("Еще попытку")
+                                    .fontWeight(.bold)
+                                    .modifier(BigButton())
+                                }.padding(.vertical, 10.0)
+                            
+                            }
+                            HStack{
+                                Button(action:{
+                                    self.answer=""
+                                    self.showScore=false
+                                    self.menu=true
+                                    self.counter=0
+                                    self.answers = [""]
+                                    self.points=0
+                                    self.choice=0
+                                })
+                                {
+                                    Text("Сначала")
+                                    .fontWeight(.bold)
+                                    .modifier(BigButton())
+                                }.padding(.vertical, 10.0)
+                            
+                            }
+                    }
+                }
+                
             }
         }
     }
@@ -189,10 +335,14 @@ struct ContentView: View {
             self.answer+="\(number)"
         }
     }
+  
     func CheckAnswer(_ answer: String, _ correct: String){
         if (answer==correct){
+            corectness+=["Nice"]
             points+=1
-        } else { points+=0 }
+        } else {
+            corectness+=["Error"]
+            points+=0 }
     }
 }
 
